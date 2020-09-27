@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
 import { Button, CircularProgress, TextField, Typography } from '@material-ui/core';
 import axios from 'axios';
+import moment from 'moment';
 import Chart from './chart';
 
 const STATE_DEFAULT = 'none';
@@ -12,6 +13,15 @@ const STATE_FAILURE = 'failure';
 
 const useStyles = makeStyles((theme) =>
     createStyles({
+        form: {
+            display: 'flex',
+        },
+        section: {
+            paddingTop: '30px'
+        },
+        submit: {
+            marginTop: 'auto'
+        }
     })
 );
 
@@ -22,9 +32,12 @@ function Contributions() {
     const [results, setResults] = useState(null);
 
     async function submitUsername() {
+        if (!username.length) {
+            return;
+        }
+
         setCallState(STATE_SUBMITTING);
         const result = await axios.post(`https://twittercontributions.azurewebsites.net/api/SubmitFetchRequest?username=${username}`);
-        console.log(result);
         if (result.status === 202) {
             setCallState(STATE_POLLING);
             pollUsername(username);
@@ -39,7 +52,6 @@ function Contributions() {
     function pollUsername() {
         const timer = setInterval(async () => {
             const result = await axios.get(`https://twittercontributions.azurewebsites.net/api/CheckStatus?username=${username}`);
-            console.log(result);
             if (result.status === 404) {
                 // eat it
             } else if (result.status === 200) {
@@ -60,10 +72,10 @@ function Contributions() {
     if (callState === STATE_DEFAULT || callState === STATE_FAILURE) {
         return (
             <>
-                <Typography variant="body1">Lookup your Twitter contribution history over the past year.</Typography>
-                <div>
-                    <TextField label="Username" onChange={e => handleTextFieldUpdate(e)}/>
-                    <Button variant="contained" onClick={() => submitUsername()} disabled={!username.length}>Submit</Button>
+                <Typography variant="body1">Look up your (or someone's) Twitter contribution history over the past year.</Typography>
+                <div className={classes.form}>
+                    <TextField label="Username" onChange={e => handleTextFieldUpdate(e)} onKeyPress={ev => { if (ev.key === 'Enter') submitUsername(); }}/>
+                    <Button variant="contained" className={classes.submit} onClick={() => submitUsername()} disabled={!username.length}>Submit</Button>
                 </div>
                 {callState === STATE_FAILURE && <Typography variant="caption">We hit an unexpected error. Please try again.</Typography>}
             </>
@@ -91,7 +103,19 @@ function Contributions() {
 
     if (callState === STATE_SUCCESS) {
         return (
-            <Chart summary={results.summary}/>
+            <>
+                <Chart summary={results.summary}/>
+                <div className={classes.section}>
+                    <Typography variant="caption">This data is cached and expires {moment(results.run_time).add(1, 'days').format('MMMM Do YYYY, h:mm:ss a')}.</Typography>
+                </div>
+                <div className={classes.section}>
+                    <Typography variant="body1">Look up another contribution history?</Typography>
+                    <div className={classes.form}>
+                        <TextField label="Username" onChange={e => handleTextFieldUpdate(e)} onKeyPress={ev => { if (ev.key === 'Enter') submitUsername(); }}/>
+                        <Button variant="contained" className={classes.submit} onClick={() => submitUsername()} disabled={!username.length}>Submit</Button>
+                    </div>
+                </div>
+            </>
         )
     }
 
