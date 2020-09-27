@@ -1,0 +1,60 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- master
+
+stages:
+- stage: build
+  jobs:
+  - job: build
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - task: NodeTool@0
+      displayName: Install Node.js
+      inputs:
+        versionSpec: '10.x'
+    - task: YarnInstaller@3
+      displayName: Setup yarn
+      inputs:
+        versionSpec: '1.x'
+    - task: Yarn@3
+      displayName: yarn install --frozen-lockfile
+      inputs:
+        arguments: 'install'
+    - task: Yarn@3
+      displayName: yarn build
+      inputs:
+        arguments: 'build'
+    - task: CopyFiles@2
+      inputs:
+        SourceFolder: 'build'
+        Contents: '**'
+        TargetFolder: '$(build.artifactstagingdirectory)'
+        CleanTargetFolder: true
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(build.artifactstagingdirectory)'
+        ArtifactName: 'build'
+- stage: deploy
+  jobs:
+  - deployment: deploy
+    pool:
+      vmImage: 'vs2017-win2016'
+    environment: 'Deploy to storage'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: current
+            artifact: build
+          - task: AzureFileCopy@3
+            inputs:
+              SourcePath: '$(Pipeline.Workspace)/build'
+              azureSubscription: 'Visual Studio Enterprise (f88d40c9-3655-4267-bd39-2598c7274344)'
+              Destination: 'AzureBlob'
+              storage: 'twittercontrib'
+              ContainerName: '$web'
