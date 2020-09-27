@@ -2,7 +2,8 @@ import React from 'react';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
 import { AppBar, Toolbar, IconButton, Typography } from '@material-ui/core';
 import GithubIcon from '@material-ui/icons/GitHub';
-
+import Contributions from './components/contributions/contributions';
+import Chart from './components/contributions/chart';
 
 const useStyles = makeStyles((theme) =>
     createStyles({
@@ -24,14 +25,14 @@ const useStyles = makeStyles((theme) =>
             maxWidth: '1081px',
             width: '100%',
             margin: 'auto',
-            paddingTop: '20px'
+            paddingTop: '80px'
         }
     })
 );
 
 function App() {
     const classes = useStyles();
-
+    
     return (
         <div className={classes.root}>
             <AppBar position="static">
@@ -39,13 +40,14 @@ function App() {
                     <Typography className={classes.title} variant="h6">
                         Twitter Contributions
                     </Typography>
-                    <IconButton color="inherit" aria-label="menu">
+                    <IconButton color="inherit" aria-label="menu" href="https://github.com/Jtfinlay/twitter-contributions-service">
                         <GithubIcon />
                     </IconButton>
                 </Toolbar>
             </AppBar>
             <main className={classes.main}>
-                <Typography variant="body">Lookup your Twitter contribution history over the past year.</Typography>
+                <Contributions />
+                <Chart/>
             </main>
         </div>
     );
