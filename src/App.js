@@ -1,26 +1,54 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { makeStyles, createStyles } from '@material-ui/core/styles';
+import { AppBar, Toolbar, IconButton, Typography } from '@material-ui/core';
+import GithubIcon from '@material-ui/icons/GitHub';
+
+
+const useStyles = makeStyles((theme) =>
+    createStyles({
+        spacer: {
+            flexGrow: 1,
+        },
+        toolbar: {
+            maxWidth: '1081px',
+            width: '100%',
+            margin: 'auto'
+        },
+        title: {
+            flexGrow: 1
+        },
+        root: {
+            flexGrow: 1
+        },
+        main: {
+            maxWidth: '1081px',
+            width: '100%',
+            margin: 'auto',
+            paddingTop: '20px'
+        }
+    })
+);
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    const classes = useStyles();
+
+    return (
+        <div className={classes.root}>
+            <AppBar position="static">
+                <Toolbar className={classes.toolbar}>
+                    <Typography className={classes.title} variant="h6">
+                        Twitter Contributions
+                    </Typography>
+                    <IconButton color="inherit" aria-label="menu">
+                        <GithubIcon />
+                    </IconButton>
+                </Toolbar>
+            </AppBar>
+            <main className={classes.main}>
+                <Typography variant="body">Lookup your Twitter contribution history over the past year.</Typography>
+            </main>
+        </div>
+    );
 }
 
 export default App;
