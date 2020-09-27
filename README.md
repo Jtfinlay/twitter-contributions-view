@@ -1,3 +1,9 @@
+# twitter-contributions-view
+
+Server-side repository to execute [TweetLog](https://tweetlog.azureedge.net/) operations.
+
+Backend code available here: https://github.com/Jtfinlay/twitter-contributions-service
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
