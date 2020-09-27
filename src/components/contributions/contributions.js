@@ -30,6 +30,7 @@ function Contributions() {
     const [username, setUsername] = useState('');
     const [callState, setCallState] = useState(STATE_DEFAULT);
     const [results, setResults] = useState(null);
+    const [warning, setWarning] = useState(null);
 
     async function submitUsername() {
         if (!username.length) {
@@ -37,30 +38,48 @@ function Contributions() {
         }
 
         setCallState(STATE_SUBMITTING);
-        const result = await axios.post(`https://twittercontributions.azurewebsites.net/api/SubmitFetchRequest?username=${username}`);
-        if (result.status === 202) {
-            setCallState(STATE_POLLING);
-            pollUsername(username);
-        } else if (result.status === 200) {
-            setResults(result.data);
-            setCallState(STATE_SUCCESS);
-        } else {
-            setCallState(STATE_FAILURE);
+        try {
+            const result = await axios.post(`https://twittercontributions.azurewebsites.net/api/SubmitFetchRequest?username=${username}`);
+            if (result.status === 202) {
+                setCallState(STATE_POLLING);
+                pollUsername(username);
+            } else if (result.status === 200) {
+                setResults(result.data);
+                setCallState(STATE_SUCCESS);
+            } else {
+                setCallState(STATE_FAILURE);
+            }
+        } catch (err) {
+            if (err.response.status === 429) {
+                setWarning(`We have hit our API limit with Twitter. Jobs will continue to run: ${moment.unix(err.response.data)}`);
+                setCallState(STATE_POLLING);
+                pollUsername(username);
+            } else {
+                setCallState(STATE_FAILURE);
+            }
         }
     }
 
     function pollUsername() {
         const timer = setInterval(async () => {
-            const result = await axios.get(`https://twittercontributions.azurewebsites.net/api/CheckStatus?username=${username}`);
-            if (result.status === 404) {
-                // eat it
-            } else if (result.status === 200) {
-                setResults(result.data);
-                setCallState(STATE_SUCCESS);
-                clearInterval(timer);
-            } else {
-                setCallState(STATE_FAILURE);
-                clearInterval(timer);
+            try {
+                const result = await axios.get(`https://twittercontributions.azurewebsites.net/api/CheckStatus?username=${username}`);
+                if (result.status === 404) {
+                    // eat it
+                } else if (result.status === 200) {
+                    setResults(result.data);
+                    setCallState(STATE_SUCCESS);
+                    clearInterval(timer);
+                } else {
+                    setCallState(STATE_FAILURE);
+                    clearInterval(timer);
+                }
+            } catch (err) {
+                if (err.response.status === 429) {
+                    setWarning(`We have hit our API limit with Twitter. Jobs will continue to run: ${moment.unix(err.response.data)}`);
+                } else {
+                    setCallState(STATE_FAILURE);
+                }
             }
         }, 500);
     }
@@ -96,7 +115,7 @@ function Contributions() {
             <>
                 <CircularProgress/>
                 <Typography variant="body1">Request submitted! Waiting for results..</Typography>
-                <Typography variant="body1">You can leave and come back. We'll hold results for 24 hours.</Typography>
+                <Typography variant="caption">⚠ {warning}</Typography>
             </>
         )
     }

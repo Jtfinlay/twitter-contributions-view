@@ -18,13 +18,16 @@ const useStyles = makeStyles((theme) =>
             flexGrow: 1
         },
         root: {
-            flexGrow: 1
+            flexGrow: 1,
         },
         main: {
             maxWidth: '1081px',
             width: '100%',
             margin: 'auto',
             paddingTop: '80px'
+        },
+        footer: {
+            paddingTop: '300px'
         }
     })
 );
@@ -46,6 +49,11 @@ function App() {
             </AppBar>
             <main className={classes.main}>
                 <Contributions />
+                
+                <footer className={classes.footer}>
+                    <Typography>Made with ♥ by <a href="https://twitter.com/JtFinlay" target="_blank">@Jtfinlay</a></Typography>
+                    <Typography>Leverages Twitter apis, no affiliation with Twitter.</Typography>
+                </footer>
             </main>
         </div>
     );

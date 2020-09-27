@@ -106,7 +106,7 @@ function Chart(props) {
             currentMonth = startDate.format('MMM');
             startDate.add(1, 'weeks');
             return (
-                <text text-anchor="start" dx={(1+week)*16} y="-8" class={classes.wday}>{currentMonth}</text>
+                <text dx={(1+week)*16} y="-8" className={classes.wday}>{currentMonth}</text>
             );
         });
     }
@@ -138,9 +138,9 @@ function Chart(props) {
                     <g transform="translate(10,20)">
                         { renderWeeks(startDate.clone(), numberOfWeeks, props.data.summary) }
                         { renderMonthLabels(startDate.clone()) }
-                        <text text-anchor="start" class={classes.wday} dx="-10" dy="25">Mon</text>
-                        <text text-anchor="start" class={classes.wday} dx="-10" dy="56">Wed</text>
-                        <text text-anchor="start" class={classes.wday} dx="-10" dy="85">Fri</text>
+                        <text className={classes.wday} dx="-10" dy="25">Mon</text>
+                        <text className={classes.wday} dx="-10" dy="56">Wed</text>
+                        <text className={classes.wday} dx="-10" dy="85">Fri</text>
                     </g>
                 </svg>
             </div>
