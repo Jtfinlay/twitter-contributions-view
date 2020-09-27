@@ -5,8 +5,17 @@ import moment from 'moment';
 
 const useStyles = makeStyles((theme) =>
     createStyles({
+        chart: {
+            overflow: 'hidden',
+            display: 'flex',
+            alignItems: 'flex-end'
+        },
         container: {
             paddingTop: '30px'
+        },
+        wday: {
+            fontSize: '9px',
+            fill: '#767676',
         },
         userDetails: {
             display: 'flex',
@@ -50,8 +59,64 @@ function Chart(props) {
         return 'lightgrey';
     }
     
+    function renderWeeks(startDate, numberOfWeeks, data) {
+        return [...Array(numberOfWeeks).keys()].map(week => {
+            return (
+                <g transform={`translate(${16*week}, 0)`} key={week}>
+                    {[...Array(7).keys()].map(day => {
+                        const date = startDate.format('YYYY-MM-DD');
+                        startDate.add(1, 'days')
+                        if (date > moment().format('YYYY-MM-DD')) {
+                            return null;
+                        }
+
+                        const summary = data.find(s => s.date === date);
+                        let title = `No contributions on ${date}`;
+                        if (summary) {
+                            title = `${summary.status_count} statuses and ${summary.like_count} likes on ${date}`;
+                        }
+
+                        return (
+                            <Tooltip key={week*7+day} title={title} placement="top">
+                                <rect
+                                    className="day"
+                                    width="11"
+                                    height="11"
+                                    x="16"
+                                    y={16*day}
+                                    fill={getColor(summary)}
+                                    data-date={date}
+                                ></rect>
+                            </Tooltip>
+                        )
+                    })}
+                </g>
+            );
+        });
+    }
+
+    function renderMonthLabels(startDate) {
+        let currentMonth = '';
+        return [...Array(numberOfWeeks).keys()].map(week => {
+            if (startDate.format('MMM') === currentMonth) {
+                startDate.add(1, 'weeks');
+                return null;
+            }
+
+            currentMonth = startDate.format('MMM');
+            startDate.add(1, 'weeks');
+            return (
+                <text text-anchor="start" dx={(1+week)*16} y="-8" class={classes.wday}>{currentMonth}</text>
+            );
+        });
+    }
+    
     const likes = props.data.summary.reduce((acc, curr) => acc + curr.like_count, 0);
     const contrib = props.data.summary.reduce((acc, curr) => acc + curr.status_count, 0);
+    let startDate = moment().subtract(1, 'years');
+    while (startDate.format('ddd') !== 'Sun') {
+        startDate.add(1, 'days');
+    }
 
     return (
         <div className={classes.container}>
@@ -68,39 +133,17 @@ function Chart(props) {
                 </div>
             </div>
             <Typography variant="h6">{contrib} contributions and {likes} likes in the last year.</Typography>
-            <svg width="828" height="128">
-                {
-                    [...Array(numberOfWeeks).keys()].map(week => {
-                        const startOfWeek = moment().subtract(numberOfWeeks - week, 'weeks');
-                        return (
-                            <g transform={`translate(${16*week}, 0)`} key={week}>
-                                {[...Array(7).keys()].map(day => {
-                                    const date = startOfWeek.add(1, 'days').format('YYYY-MM-DD');
-                                    const summary = props.data.summary.find(s => s.date === date);
-                                    let title = `No contributions on ${date}`;
-                                    if (summary) {
-                                        title = `${summary.status_count} statuses and ${summary.like_count} likes on ${date}`;
-                                    }
-
-                                    return (
-                                        <Tooltip key={week*7+day} title={title} placement="top">
-                                            <rect
-                                                className="day"
-                                                width="11"
-                                                height="11"
-                                                x="16"
-                                                y={16*day}
-                                                fill={getColor(summary)}
-                                                data-date={date}
-                                            ></rect>
-                                        </Tooltip>
-                                    )
-                                })}
-                            </g>
-                        );
-                    })
-                }
-            </svg>
+            <div className={classes.chart}>
+                <svg width="1000" height="128">
+                    <g transform="translate(10,20)">
+                        { renderWeeks(startDate.clone(), numberOfWeeks, props.data.summary) }
+                        { renderMonthLabels(startDate.clone()) }
+                        <text text-anchor="start" class={classes.wday} dx="-10" dy="25">Mon</text>
+                        <text text-anchor="start" class={classes.wday} dx="-10" dy="56">Wed</text>
+                        <text text-anchor="start" class={classes.wday} dx="-10" dy="85">Fri</text>
+                    </g>
+                </svg>
+            </div>
         </div>
     );
 }

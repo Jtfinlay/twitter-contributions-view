@@ -104,7 +104,7 @@ function Contributions() {
     if (callState === STATE_SUCCESS) {
         return (
             <>
-                <Chart summary={results.summary}/>
+                <Chart data={results}/>
                 <div className={classes.section}>
                     <Typography variant="caption">This data is cached and expires {moment(results.run_time).add(1, 'days').format('MMMM Do YYYY, h:mm:ss a')}.</Typography>
                 </div>
