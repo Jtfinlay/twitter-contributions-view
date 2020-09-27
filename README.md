@@ -1,6 +1,6 @@
 # twitter-contributions-view
 
-Server-side repository to execute [TweetLog](https://tweetlog.azureedge.net/) operations.
+Client-side repository for [TweetLog](https://tweetlog.azureedge.net/) front end.
 
 Backend code available here: https://github.com/Jtfinlay/twitter-contributions-service
 
