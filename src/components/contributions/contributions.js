@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
 import { Button, CircularProgress, TextField, Typography } from '@material-ui/core';
 import axios from 'axios';
+import Chart from './chart';
 
 const STATE_DEFAULT = 'none';
 const STATE_SUBMITTING = 'submitting';
@@ -37,7 +38,7 @@ function Contributions() {
 
     function pollUsername() {
         const timer = setInterval(async () => {
-            const result = await axios.get(`https://twittercontributions.azurewebsites.net/api/FetchSubmission?username=${username}`);
+            const result = await axios.get(`https://twittercontributions.azurewebsites.net/api/CheckStatus?username=${username}`);
             console.log(result);
             if (result.status === 404) {
                 // eat it
@@ -83,17 +84,14 @@ function Contributions() {
             <>
                 <CircularProgress/>
                 <Typography variant="body1">Request submitted! Waiting for results..</Typography>
+                <Typography variant="body1">You can leave and come back. We'll hold results for 24 hours.</Typography>
             </>
         )
     }
 
     if (callState === STATE_SUCCESS) {
-        const likes = results.summary.reduce((acc, curr) => acc + curr.like_count, 0);
-        const contrib = results.summary.reduce((acc, curr) => acc + curr.status_count, 0);
         return (
-            <>
-                <Typography variant="body1">{contrib} contributions and {likes} likes in the last year.</Typography>
-            </>
+            <Chart summary={results.summary}/>
         )
     }
 

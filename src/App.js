@@ -3,7 +3,6 @@ import { makeStyles, createStyles } from '@material-ui/core/styles';
 import { AppBar, Toolbar, IconButton, Typography } from '@material-ui/core';
 import GithubIcon from '@material-ui/icons/GitHub';
 import Contributions from './components/contributions/contributions';
-import Chart from './components/contributions/chart';
 
 const useStyles = makeStyles((theme) =>
     createStyles({
@@ -47,7 +46,6 @@ function App() {
             </AppBar>
             <main className={classes.main}>
                 <Contributions />
-                <Chart/>
             </main>
         </div>
     );

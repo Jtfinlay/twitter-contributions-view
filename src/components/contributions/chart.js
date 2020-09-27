@@ -2,7 +2,6 @@ import React from 'react';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
 import { Tooltip, Typography } from '@material-ui/core';
 import moment from 'moment';
-import data from './testData.json';
 
 const useStyles = makeStyles((theme) =>
     createStyles({
@@ -12,14 +11,14 @@ const useStyles = makeStyles((theme) =>
     })
 );
 
-function Chart() {
+function Chart(props) {
     const classes = useStyles();
 
     const numberOfDays = 371;
     const numberOfWeeks = numberOfDays / 7;
 
     let maxActivityValue = 0;
-    data.summary.forEach(s => {
+    props.summary.forEach(s => {
         if (maxActivityValue < s.like_count + s.status_count) {
             maxActivityValue = s.like_count + s.status_count;
         }
@@ -44,8 +43,8 @@ function Chart() {
         return 'lightgrey';
     }
     
-    const likes = data.summary.reduce((acc, curr) => acc + curr.like_count, 0);
-    const contrib = data.summary.reduce((acc, curr) => acc + curr.status_count, 0);
+    const likes = props.summary.reduce((acc, curr) => acc + curr.like_count, 0);
+    const contrib = props.summary.reduce((acc, curr) => acc + curr.status_count, 0);
 
     return (
         <div className={classes.container}>
@@ -57,8 +56,8 @@ function Chart() {
                         return (
                             <g transform={`translate(${16*week}, 0)`} key={week}>
                                 {[...Array(7).keys()].map(day => {
-                                    const date = startOfWeek.add(1, 'days').format('YYYY:MM:DD');
-                                    const summary = data.summary.find(s => s.date === date);
+                                    const date = startOfWeek.add(1, 'days').format('YYYY-MM-DD');
+                                    const summary = props.summary.find(s => s.date === date);
                                     let title = `No contributions on ${date}`;
                                     if (summary) {
                                         title = `${summary.status_count} statuses and ${summary.like_count} likes on ${date}`;
