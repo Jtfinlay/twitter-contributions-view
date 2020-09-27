@@ -75,7 +75,9 @@ function Contributions() {
                     clearInterval(timer);
                 }
             } catch (err) {
-                if (err.response.status === 429) {
+                if (err.response.status === 404) {
+                    // eat it
+                } else if (err.response.status === 429) {
                     setWarning(`We have hit our API limit with Twitter. Jobs will continue to run: ${moment.unix(err.response.data)}`);
                 } else {
                     setCallState(STATE_FAILURE);
@@ -115,7 +117,7 @@ function Contributions() {
             <>
                 <CircularProgress/>
                 <Typography variant="body1">Request submitted! Waiting for results..</Typography>
-                <Typography variant="caption">⚠ {warning}</Typography>
+                {warning && <Typography variant="caption">⚠ {warning}</Typography>}
             </>
         )
     }
